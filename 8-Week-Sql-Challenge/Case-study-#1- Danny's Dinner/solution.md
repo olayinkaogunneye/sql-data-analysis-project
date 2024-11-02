@@ -25,8 +25,7 @@ SELECT
     DISTINCT s.customer_id,
     COUNT(DISTINCT s.order_date) AS num_of_visit_days
 FROM dannys_diner.sales s
-JOIN dannys_diner.menu m USING(product_id)
-GROUP BY 1
+GROUP BY 1;
 ```
 | customer_id | num_of_visit_days |
 | ----------- | ----------------- |
