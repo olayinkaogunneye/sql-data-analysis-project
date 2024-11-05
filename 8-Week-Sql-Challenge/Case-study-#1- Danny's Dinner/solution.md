@@ -106,4 +106,143 @@ WITH most_popular AS (
 | B           | ramen        | 2                            |
 | C           | ramen        | 3                            |
 
-        
+---
+### 6. Which item was purchased first by the customer after they became a member?
+```sql
+WITH first_purchased AS (
+   SELECT
+        s.customer_id,
+        m.product_name,
+        me.join_date,
+        s.order_date,
+        COUNT(product_name) AS num_of_times_product_ordered,
+        ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date) AS row_num
+    FROM dannys_diner.sales s
+    JOIN dannys_diner.menu m USING(product_id)
+    LEFT JOIN  dannys_diner.members me USING(customer_id)
+    WHERE me.join_date < s.order_date
+    GROUP BY 1, 2, 3, 4
+    ORDER BY 1)
+	SELECT 
+		customer_id,
+        product_name,
+        num_of_times_product_ordered
+	FROM first_purchased
+    WHERE row_num =1;
+
+```
+| customer_id | product_name | num_of_times_product_ordered |
+| ----------- | ------------ | ---------------------------- |
+| A           | ramen        | 1                            |
+| B           | sushi        | 1                            |
+
+---
+### 7. Which item was purchased just before the customer became a member?
+```sql
+WITH last_purchased AS (
+   SELECT
+        s.customer_id,
+        m.product_name,
+        me.join_date,
+        s.order_date,
+        COUNT(product_name) AS num_of_times_product_ordered,
+        ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date DESC) AS row_num
+    FROM dannys_diner.sales s
+    JOIN dannys_diner.menu m USING(product_id)
+    LEFT JOIN  dannys_diner.members me USING(customer_id)
+    WHERE me.join_date < s.order_date
+    GROUP BY 1, 2, 3, 4
+    ORDER BY 1)
+	SELECT 
+		customer_id,
+        product_name,
+        num_of_times_product_ordered
+	FROM last_purchased
+    WHERE row_num =1;
+
+```
+| customer_id | product_name | num_of_times_product_ordered |
+| ----------- | ------------ | ---------------------------- |
+| A           | sushi        | 1                            |
+| B           | sushi        | 1                            |
+
+---
+### 8. What is the total items and amount spent for each member before they became a member?
+```sql
+SELECT
+    	customer_id,
+        SUM(price) as amount_spent,
+        COUNT(product_id) as total_amount
+	FROM dannys_diner.sales s
+	JOIN dannys_diner.menu m USING(product_id)
+	LEFT JOIN dannys_diner.members me USING(customer_id)
+WHERE s.order_date < me.join_date
+GROUP BY 1
+ORDER BY 1;
+
+```
+| customer_id | num_of_items | total_amount |
+| ----------- | ------------ | ------------ |
+| A           | 2            | 25           |
+| B           | 3            | 40           |
+
+---
+
+### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+```sql
+WITH multiplier AS (
+    SELECT
+        s.customer_id,
+        m.product_name,
+        m.price,
+        CASE WHEN product_id = 1 THEN m.price*20 ELSE m.price*10 END AS points
+    FROM dannys_diner.menu m
+    JOIN dannys_diner.sales s USING(product_id)
+)
+SELECT
+    customer_id,
+    SUM(points) AS total_price
+FROM multiplier
+GROUP BY 1
+ORDER BY 2 DESC
+```
+| customer_id | total_price |
+| ----------- | ----------- |
+| B           | 940         |
+| A           | 860         |
+| C           | 360         |
+
+---
+
+### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+```sql
+WITH earnings AS (
+    SELECT
+        customer_id,
+        s.product_id,
+        s.order_date,
+        m.join_date
+    FROM dannys_diner.sales s
+    JOIN dannys_diner.members m USING(customer_id)
+    WHERE m.join_date <= s.order_date
+)
+SELECT
+    customer_id,
+    SUM(total_point) AS total_point
+FROM(
+    SELECT
+        customer_id,
+        product_id,
+        SUM(CASE WHEN order_date < join_date + interval '7 DAY' THEN price * 20 ELSE price*10 END) AS total_point
+    FROM earnings ea
+    JOIN dannys_diner.menu me USING(product_id)
+    WHERE extract(MONTH FROM order_date) = 01
+    GROUP BY 1,2
+) AS stopp
+GROUP BY 1
+```
+
+| customer_id | total_point |
+| ----------- | ----------- |
+| A           | 1020        |
+| B           | 320         |
