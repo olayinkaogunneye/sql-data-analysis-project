@@ -282,3 +282,45 @@ ORDER BY 1,2
 | C           | 2021-01-01T00:00:00.000Z | ramen        | 12    | N      |
 | C           | 2021-01-07T00:00:00.000Z | ramen        | 12    | N      |
 
+### Rank All The Things
+```sql
+WITH users_details AS (
+    SELECT *,
+        CASE WHEN join_date <= order_date THEN 'Y' ELSE 'N' END AS member
+    FROM dannys_diner.sales s
+    JOIN dannys_diner.menu m USING(product_id)
+    LEFT JOIN dannys_diner.members me USING(customer_id)
+)
+SELECT
+    customer_id,
+    order_date,
+    product_name,
+    price,
+    member,
+    CASE WHEN member = 'Y' THEN (RANK() OVER(PARTITION BY customer_id,member
+                       ORDER BY order_date)) ELSE NULL END AS ranking
+FROM users_details
+```
+
+| customer_id | order_date               | product_name | price | member | ranking |
+| ----------- | ------------------------ | ------------ | ----- | ------ | ------- |
+| A           | 2021-01-01T00:00:00.000Z | sushi        | 10    | N      |         |
+| A           | 2021-01-01T00:00:00.000Z | curry        | 15    | N      |         |
+| A           | 2021-01-07T00:00:00.000Z | curry        | 15    | Y      | 1       |
+| A           | 2021-01-10T00:00:00.000Z | ramen        | 12    | Y      | 2       |
+| A           | 2021-01-11T00:00:00.000Z | ramen        | 12    | Y      | 3       |
+| A           | 2021-01-11T00:00:00.000Z | ramen        | 12    | Y      | 3       |
+| B           | 2021-01-01T00:00:00.000Z | curry        | 15    | N      |         |
+| B           | 2021-01-02T00:00:00.000Z | curry        | 15    | N      |         |
+| B           | 2021-01-04T00:00:00.000Z | sushi        | 10    | N      |         |
+| B           | 2021-01-11T00:00:00.000Z | sushi        | 10    | Y      | 1       |
+| B           | 2021-01-16T00:00:00.000Z | ramen        | 12    | Y      | 2       |
+| B           | 2021-02-01T00:00:00.000Z | ramen        | 12    | Y      | 3       |
+| C           | 2021-01-01T00:00:00.000Z | ramen        | 12    | N      |         |
+| C           | 2021-01-01T00:00:00.000Z | ramen        | 12    | N      |         |
+| C           | 2021-01-07T00:00:00.000Z | ramen        | 12    | N      |         |
+
+
+
+
+
