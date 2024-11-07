@@ -246,3 +246,39 @@ GROUP BY 1
 | ----------- | ----------- |
 | A           | 1020        |
 | B           | 320         |
+
+
+## Bonus Questions
+### Joining All The Things
+```sql
+-- The members column  with value N stands for NO and Y as YES.
+SELECT
+    customer_id,
+    order_date,
+    product_name,
+    price,
+    CASE WHEN join_date <= order_date THEN 'Y' ELSE 'N' END AS member
+FROM dannys_diner.sales s
+JOIN dannys_diner.menu m USING(product_id)
+LEFT JOIN dannys_diner.members me USING(customer_id)
+ORDER BY 1,2
+```
+
+| customer_id | order_date               | product_name | price | member |
+| ----------- | ------------------------ | ------------ | ----- | ------ |
+| A           | 2021-01-01T00:00:00.000Z | sushi        | 10    | N      |
+| A           | 2021-01-01T00:00:00.000Z | curry        | 15    | N      |
+| A           | 2021-01-07T00:00:00.000Z | curry        | 15    | Y      |
+| A           | 2021-01-10T00:00:00.000Z | ramen        | 12    | Y      |
+| A           | 2021-01-11T00:00:00.000Z | ramen        | 12    | Y      |
+| A           | 2021-01-11T00:00:00.000Z | ramen        | 12    | Y      |
+| B           | 2021-01-01T00:00:00.000Z | curry        | 15    | N      |
+| B           | 2021-01-02T00:00:00.000Z | curry        | 15    | N      |
+| B           | 2021-01-04T00:00:00.000Z | sushi        | 10    | N      |
+| B           | 2021-01-11T00:00:00.000Z | sushi        | 10    | Y      |
+| B           | 2021-01-16T00:00:00.000Z | ramen        | 12    | Y      |
+| B           | 2021-02-01T00:00:00.000Z | ramen        | 12    | Y      |
+| C           | 2021-01-01T00:00:00.000Z | ramen        | 12    | N      |
+| C           | 2021-01-01T00:00:00.000Z | ramen        | 12    | N      |
+| C           | 2021-01-07T00:00:00.000Z | ramen        | 12    | N      |
+
