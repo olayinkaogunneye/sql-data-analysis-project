@@ -111,7 +111,7 @@ WITH most_popular AS (
 ```sql
 WITH first_purchased AS (
    SELECT
-        s.customer_id,
+	s.customer_id,
         m.product_name,
         me.join_date,
         s.order_date,
@@ -124,7 +124,7 @@ WITH first_purchased AS (
     GROUP BY 1, 2, 3, 4
     ORDER BY 1)
 	SELECT 
-		customer_id,
+	customer_id,
         product_name,
         num_of_times_product_ordered
 	FROM first_purchased
@@ -154,7 +154,7 @@ WITH last_purchased AS (
     GROUP BY 1, 2, 3, 4
     ORDER BY 1)
 	SELECT 
-		customer_id,
+	customer_id,
         product_name,
         num_of_times_product_ordered
 	FROM last_purchased
