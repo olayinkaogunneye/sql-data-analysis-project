@@ -55,3 +55,59 @@ GROUP BY pizza_id;
 ![image](https://user-images.githubusercontent.com/77529445/164606389-9128a4e0-90e9-467b-a593-c18c62ca007e.png)
 
 ***
+
+###  5. How many Vegetarian and Meatlovers were ordered by each customer?
+
+```sql
+SELECT customer_id,
+       pizza_name,
+       count(pizza_id) AS 'Number Of Pizzas Ordered'
+FROM customer_orders_temp
+INNER JOIN pizza_names USING (pizza_id)
+GROUP BY customer_id,
+         pizza_id
+ORDER BY customer_id ;
+``` 
+	
+#### Result set:
+![image](https://user-images.githubusercontent.com/77529445/164606480-326c416f-a909-49e8-8bda-8055ee247fd1.png)
+
+- The counts of the Meat lover and Vegetarian pizzas ordered by the customers is not discernible.
+
+```sql
+SELECT customer_id,
+       SUM(CASE
+               WHEN pizza_id = 1 THEN 1
+               ELSE 0
+           END) AS 'Meat lover Pizza Count',
+       SUM(CASE
+               WHEN pizza_id = 2 THEN 1
+               ELSE 0
+           END) AS 'Vegetarian Pizza Count'
+FROM customer_orders_temp
+GROUP BY customer_id
+ORDER BY customer_id;
+``` 
+	
+#### Result set:
+![image](https://user-images.githubusercontent.com/77529445/164606848-8980ebb9-a8e5-4b2b-a612-b86b19f4df08.png)
+
+***
+
+
+###  6. What was the maximum number of pizzas delivered in a single order?
+
+```sql
+SELECT customer_id,
+       order_id,
+       count(order_id) AS pizza_count
+FROM customer_orders_temp
+GROUP BY order_id
+ORDER BY pizza_count DESC
+LIMIT 1;
+``` 
+	
+#### Result set:
+![image](https://user-images.githubusercontent.com/77529445/164608353-a577858f-1d1c-46ed-b1f2-05644b756604.png)
+
+***
