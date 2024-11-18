@@ -36,3 +36,22 @@ GROUP BY runner_id;
 ![image](https://user-images.githubusercontent.com/77529445/164606290-b70ee6e3-ed23-417a-9e86-e8555d9e55c3.png)
 
 ***
+
+###  4. How many of each type of pizza was delivered?
+
+```sql
+
+SELECT pizza_id,
+       pizza_name,
+       count(pizza_id) AS 'Number Of Pizzas Delivered'
+FROM pizza_runner.runner_orders_temp
+INNER JOIN customer_orders_temp USING (order_id)
+INNER JOIN pizza_names USING (pizza_id)
+WHERE cancellation IS NULL
+GROUP BY pizza_id;
+``` 
+	
+#### Result set:
+![image](https://user-images.githubusercontent.com/77529445/164606389-9128a4e0-90e9-467b-a593-c18c62ca007e.png)
+
+***
