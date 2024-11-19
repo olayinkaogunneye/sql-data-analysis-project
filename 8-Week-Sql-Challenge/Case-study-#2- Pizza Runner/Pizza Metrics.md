@@ -111,3 +111,28 @@ LIMIT 1;
 ![image](https://user-images.githubusercontent.com/77529445/164608353-a577858f-1d1c-46ed-b1f2-05644b756604.png)
 
 ***
+###  7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+- at least 1 change -> either exclusion or extras 
+- no changes -> exclusion and extras are NULL
+
+```sql
+SELECT customer_id,
+       SUM(CASE
+               WHEN (exclusions IS NOT NULL
+                     OR extras IS NOT NULL) THEN 1
+               ELSE 0
+           END) AS change_in_pizza,
+       SUM(CASE
+               WHEN (exclusions IS NULL
+                     AND extras IS NULL) THEN 1
+               ELSE 0
+           END) AS no_change_in_pizza
+FROM customer_orders_temp
+INNER JOIN runner_orders_temp USING (order_id)
+WHERE cancellation IS NULL
+GROUP BY customer_id
+ORDER BY customer_id;
+``` 
+
+#### Result set:
+![image](https://user-images.githubusercontent.com/77529445/164609444-9b7453ed-2477-4ce0-b7f7-39768a0ce808.png)
