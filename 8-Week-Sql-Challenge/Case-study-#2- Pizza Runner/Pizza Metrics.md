@@ -22,7 +22,7 @@ FROM customer_orders_temp;
 #### Result set:
 ![image](https://user-images.githubusercontent.com/77529445/164606186-2b5465ef-69df-4fbb-9a2d-cd50afd49c7a.png)
 
-###  3. How many successful orders were delivered by each runner?
+###  Q3. How many successful orders were delivered by each runner?
 
 ```sql
 SELECT runner_id,
@@ -37,7 +37,7 @@ GROUP BY runner_id;
 
 ***
 
-###  4. How many of each type of pizza was delivered?
+###  Q4. How many of each type of pizza was delivered?
 
 ```sql
 
@@ -56,7 +56,7 @@ GROUP BY pizza_id;
 
 ***
 
-###  5. How many Vegetarian and Meatlovers were ordered by each customer?
+###  Q5. How many Vegetarian and Meatlovers were ordered by each customer?
 
 ```sql
 SELECT customer_id,
@@ -95,7 +95,7 @@ ORDER BY customer_id;
 ***
 
 
-###  6. What was the maximum number of pizzas delivered in a single order?
+###  Q6. What was the maximum number of pizzas delivered in a single order?
 
 ```sql
 SELECT customer_id,
@@ -111,7 +111,7 @@ LIMIT 1;
 ![image](https://user-images.githubusercontent.com/77529445/164608353-a577858f-1d1c-46ed-b1f2-05644b756604.png)
 
 ***
-###  7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+###  Q7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 - at least 1 change -> either exclusion or extras 
 - no changes -> exclusion and extras are NULL
 
@@ -136,3 +136,24 @@ ORDER BY customer_id;
 
 #### Result set:
 ![image](https://user-images.githubusercontent.com/77529445/164609444-9b7453ed-2477-4ce0-b7f7-39768a0ce808.png)
+
+###  Q8. How many pizzas were delivered that had both exclusions and extras?
+
+```sql
+
+SELECT customer_id,
+       SUM(CASE
+               WHEN (exclusions IS NOT NULL
+                     AND extras IS NOT NULL) THEN 1
+               ELSE 0
+           END) AS both_change_in_pizza
+FROM customer_orders_temp
+INNER JOIN runner_orders_temp USING (order_id)
+WHERE cancellation IS NULL
+GROUP BY customer_id
+ORDER BY customer_id;
+``` 
+	
+#### Result set:
+![image](https://user-images.githubusercontent.com/77529445/164609941-c2a6f1f8-38c2-4e1c-ab64-a9dd557077e5.png)
+
