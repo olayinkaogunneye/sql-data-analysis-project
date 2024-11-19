@@ -157,3 +157,26 @@ ORDER BY customer_id;
 #### Result set:
 ![image](https://user-images.githubusercontent.com/77529445/164609941-c2a6f1f8-38c2-4e1c-ab64-a9dd557077e5.png)
 
+###  Q9. What was the total volume of pizzas ordered for each hour of the day?
+
+```sql
+SELECT
+    EXTRACT(hour FROM order_time) AS hour_of_day,
+    COUNT(order_id) AS num_of_order
+FROM pizza_runner.customer_orders
+GROUP BY 1;
+
+```
+![image](https://user-images.githubusercontent.com/120476961/226347241-8a89fca2-c4be-420c-a389-16d776807c1c.png)
+
+###  Q10. What was the volume of orders for each day of the week?
+
+```sql
+SELECT
+    TO_CHAR(order_time, 'Day') AS day_of_week,
+    EXTRACT(dow FROM order_time) AS week_day,
+    COUNT(order_id) AS num_of_orders
+FROM pizza_runner.customer_orders
+GROUP BY 1,2
+ORDER BY 3 DESC;
+
