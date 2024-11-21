@@ -173,10 +173,18 @@ GROUP BY 1;
 
 ```sql
 SELECT
-    TO_CHAR(order_time, 'Day') AS day_of_week,
+    TO_CHAR(order_time, 'Day') AS day,
     EXTRACT(dow FROM order_time) AS week_day,
     COUNT(order_id) AS num_of_orders
 FROM pizza_runner.customer_orders
 GROUP BY 1,2
 ORDER BY 3 DESC;
+
+| day       | num_of_orders |
+| --------- | ------------- |
+| Saturday  | 5             |
+| Wednesday | 5             |
+| Thursday  | 3             |
+| Friday    | 1             |
+
 
